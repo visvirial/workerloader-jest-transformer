@@ -34,7 +34,20 @@ const self = {
 		}
 	},
 	postMessage: (data, transfer) => parentPort.postMessage(data, transfer),
+	onmessage: null,
 };
+
+const postMessage = self.postMessage;
+let onmessage = null;
+
+self.addEventListener('message', (ev) => {
+	if(onmessage) {
+		onmessage(ev);
+	}
+	if(self.onmessage) {
+		self.onmessage(ev);
+	}
+});
 
 /* {% WORKER_CODE %} */
 

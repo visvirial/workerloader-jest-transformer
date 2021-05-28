@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const tmp = require('tmp');
 const wrapper = require('./utils/wrapper');
 
@@ -21,7 +22,8 @@ module.exports = {
       .createTransformer()
       .process(wrapper.wrapSource(src, lang, 'child'), filename, config, { ...options, instrument: false });
     fs.writeSync(tmpObj.fd, typeof source === 'string' ? source : source.code);
-    const wrappedSrc = wrapper.wrapSource(src, lang).replace('/* {% WORKER_FILENAME %} */', tmpObj.name);
-    return transformer.createTransformer().process(wrappedSrc, filename, config, { ...options, instrument: false });
+    const workerPath = path.resolve(__dirname, 'templates', `worker.ts`);
+    return require('ts-jest').createTransformer().process(fs.readFileSync(workerPath, {encoding:'utf8', flag:'r'})
+      .replace('/* {% WORKER_FILENAME %} */', tmpObj.name), workerPath, config, { ...options, instrument: false });
   },
 };

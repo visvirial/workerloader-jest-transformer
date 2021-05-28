@@ -35,7 +35,20 @@ const self = {
 		}
 	},
 	postMessage: (data: unknown, transfer?: TransferListItem[]) => parentPort.postMessage(data, transfer),
+	onmessage: null as ListenerFunction | null,
 };
+
+const postMessage = self.postMessage;
+let onmessage: ListenerFunction | null = null;
+
+self.addEventListener('message', (ev) => {
+	if(onmessage) {
+		onmessage(ev);
+	}
+	if(self.onmessage) {
+		self.onmessage(ev);
+	}
+});
 
 /* {% WORKER_CODE %} */
 
